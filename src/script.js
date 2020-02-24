@@ -39,23 +39,32 @@ const exec = () => {
 
   const keySelectorElem = document.createElement("div");
   keySelectorElem.setAttribute("id", "esa-sorter-key-selector");
-  keySelectorElem.appendChild(document.createTextNode(sortKeyTitleAsc));
+  const sortIconElem = document.createElement("i");
+  sortIconElem.setAttribute("id", "esa-sorter-sort-icon");
+  sortIconElem.setAttribute(
+    "class",
+    "fa fa-sort-amount-desc search__sort-icon"
+  );
+  const sortKeyTextElem = document.createElement("div");
+  sortKeyTextElem.appendChild(document.createTextNode(sortKeyTitleAsc));
   keySelectorElem.addEventListener("click", e => {
-    const current = keySelectorElem.textContent;
+    const current = sortKeyTextElem.textContent;
     if (current === sortKeyTitleAsc) {
       sort(liSorterTitleDesc);
-      keySelectorElem.textContent = sortKeyTitleDesc;
+      sortKeyTextElem.textContent = sortKeyTitleDesc;
     } else if (current === sortKeyTitleDesc) {
       sort(liSorterCountAsc);
-      keySelectorElem.textContent = sortKeyCountAsc;
+      sortKeyTextElem.textContent = sortKeyCountAsc;
     } else if (current === sortKeyCountAsc) {
       sort(liSorterCountDesc);
-      keySelectorElem.textContent = sortKeyCountDesc;
+      sortKeyTextElem.textContent = sortKeyCountDesc;
     } else {
       sort(liSorterTitleAsc);
-      keySelectorElem.textContent = sortKeyTitleAsc;
+      sortKeyTextElem.textContent = sortKeyTitleAsc;
     }
   });
+  keySelectorElem.appendChild(sortIconElem);
+  keySelectorElem.appendChild(sortKeyTextElem);
   nav.insertBefore(keySelectorElem, ul);
 
   sort(liSorterTitleAsc);
