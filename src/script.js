@@ -6,8 +6,9 @@ const liSorterTitleAsc = (a, b) => {
   }
   return 0;
 };
-
 const liSorterTitleDesc = (a, b) => -1 * liSorterTitleAsc(a, b);
+const liSorterCountAsc = (a, b) => a.count - b.count;
+const liSorterCountDesc = (a, b) => -1 * liSorterCountAsc(a, b);
 
 const nav = document.querySelector("nav.navbar-side");
 const ul = nav.querySelector("ul");
@@ -19,7 +20,8 @@ const sort = sorter => {
     .map(li => ({
       li: li,
       title: li.querySelector("span.title > span.navbar-side__title-name")
-        .innerHTML
+        .innerHTML,
+      count: Number(li.querySelector("span.count-num").innerHTML)
     }))
     .sort(sorter)
     .forEach(li => {
@@ -34,6 +36,12 @@ keySelectorElem.addEventListener("click", e => {
   if (current === "Title Asc") {
     sort(liSorterTitleDesc);
     keySelectorElem.textContent = "Title Desc";
+  } else if (current === "Title Desc") {
+    sort(liSorterCountAsc);
+    keySelectorElem.textContent = "Count Asc";
+  } else if (current === "Count Asc") {
+    sort(liSorterCountDesc);
+    keySelectorElem.textContent = "Count Desc";
   } else {
     sort(liSorterTitleAsc);
     keySelectorElem.textContent = "Title Asc";
