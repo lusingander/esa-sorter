@@ -1,3 +1,8 @@
+const sortKeyTitleAsc = "タイトル 昇順";
+const sortKeyTitleDesc = "タイトル 降順";
+const sortKeyCountAsc = "記事数 昇順";
+const sortKeyCountDesc = "記事数 降順";
+
 const liSorterTitleAsc = (a, b) => {
   if (a.title < b.title) {
     return -1;
@@ -30,21 +35,21 @@ const sort = sorter => {
 };
 
 const keySelectorElem = document.createElement("div");
-keySelectorElem.appendChild(document.createTextNode("Title Asc"));
+keySelectorElem.appendChild(document.createTextNode(sortKeyTitleAsc));
 keySelectorElem.addEventListener("click", e => {
   const current = keySelectorElem.textContent;
-  if (current === "Title Asc") {
+  if (current === sortKeyTitleAsc) {
     sort(liSorterTitleDesc);
-    keySelectorElem.textContent = "Title Desc";
-  } else if (current === "Title Desc") {
+    keySelectorElem.textContent = sortKeyTitleDesc;
+  } else if (current === sortKeyTitleDesc) {
     sort(liSorterCountAsc);
-    keySelectorElem.textContent = "Count Asc";
-  } else if (current === "Count Asc") {
+    keySelectorElem.textContent = sortKeyCountAsc;
+  } else if (current === sortKeyCountAsc) {
     sort(liSorterCountDesc);
-    keySelectorElem.textContent = "Count Desc";
+    keySelectorElem.textContent = sortKeyCountDesc;
   } else {
     sort(liSorterTitleAsc);
-    keySelectorElem.textContent = "Title Asc";
+    keySelectorElem.textContent = sortKeyTitleAsc;
   }
 });
 nav.insertBefore(keySelectorElem, ul);
