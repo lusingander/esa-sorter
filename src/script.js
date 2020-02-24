@@ -15,43 +15,49 @@ const liSorterTitleDesc = (a, b) => -1 * liSorterTitleAsc(a, b);
 const liSorterCountAsc = (a, b) => a.count - b.count;
 const liSorterCountDesc = (a, b) => -1 * liSorterCountAsc(a, b);
 
-const nav = document.querySelector("nav.navbar-side");
-const ul = nav.querySelector("ul");
-const lis = ul.querySelectorAll("li");
+const exec = () => {
+  const nav = document.querySelector("nav.navbar-side");
+  if (nav === null) return;
+  const ul = nav.querySelector("ul");
+  if (ul === null) return;
+  const lis = ul.querySelectorAll("li");
 
-const sort = sorter => {
-  [].slice
-    .call(lis)
-    .map(li => ({
-      li: li,
-      title: li.querySelector("span.title > span.navbar-side__title-name")
-        .innerHTML,
-      count: Number(li.querySelector("span.count-num").innerHTML)
-    }))
-    .sort(sorter)
-    .forEach(li => {
-      ul.appendChild(li.li);
-    });
+  const sort = sorter => {
+    [].slice
+      .call(lis)
+      .map(li => ({
+        li: li,
+        title: li.querySelector("span.title > span.navbar-side__title-name")
+          .innerHTML,
+        count: Number(li.querySelector("span.count-num").innerHTML)
+      }))
+      .sort(sorter)
+      .forEach(li => {
+        ul.appendChild(li.li);
+      });
+  };
+
+  const keySelectorElem = document.createElement("div");
+  keySelectorElem.appendChild(document.createTextNode(sortKeyTitleAsc));
+  keySelectorElem.addEventListener("click", e => {
+    const current = keySelectorElem.textContent;
+    if (current === sortKeyTitleAsc) {
+      sort(liSorterTitleDesc);
+      keySelectorElem.textContent = sortKeyTitleDesc;
+    } else if (current === sortKeyTitleDesc) {
+      sort(liSorterCountAsc);
+      keySelectorElem.textContent = sortKeyCountAsc;
+    } else if (current === sortKeyCountAsc) {
+      sort(liSorterCountDesc);
+      keySelectorElem.textContent = sortKeyCountDesc;
+    } else {
+      sort(liSorterTitleAsc);
+      keySelectorElem.textContent = sortKeyTitleAsc;
+    }
+  });
+  nav.insertBefore(keySelectorElem, ul);
+
+  sort(liSorterTitleAsc);
 };
 
-const keySelectorElem = document.createElement("div");
-keySelectorElem.appendChild(document.createTextNode(sortKeyTitleAsc));
-keySelectorElem.addEventListener("click", e => {
-  const current = keySelectorElem.textContent;
-  if (current === sortKeyTitleAsc) {
-    sort(liSorterTitleDesc);
-    keySelectorElem.textContent = sortKeyTitleDesc;
-  } else if (current === sortKeyTitleDesc) {
-    sort(liSorterCountAsc);
-    keySelectorElem.textContent = sortKeyCountAsc;
-  } else if (current === sortKeyCountAsc) {
-    sort(liSorterCountDesc);
-    keySelectorElem.textContent = sortKeyCountDesc;
-  } else {
-    sort(liSorterTitleAsc);
-    keySelectorElem.textContent = sortKeyTitleAsc;
-  }
-});
-nav.insertBefore(keySelectorElem, ul);
-
-sort(liSorterTitleAsc);
+exec();
