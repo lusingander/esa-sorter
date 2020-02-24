@@ -38,6 +38,7 @@ const exec = () => {
   };
 
   const keySelectorElem = document.createElement("div");
+  keySelectorElem.setAttribute("id", "esa-sorter-key-selector");
   keySelectorElem.appendChild(document.createTextNode(sortKeyTitleAsc));
   keySelectorElem.addEventListener("click", e => {
     const current = keySelectorElem.textContent;
