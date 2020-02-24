@@ -1,0 +1,12 @@
+{
+  "name": "esa sorter",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "description": "esa sorter",
+  "content_scripts": [
+    {
+      "matches": ["https://*.esa.io/*"],
+      "js": ["src/script.js"]
+    }
+  ]
+}
