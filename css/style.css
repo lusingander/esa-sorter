@@ -1,6 +1,8 @@
 #esa-sorter-key-selector {
   padding: 10px;
   display: flex;
+  opacity: 0.7;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 #esa-sorter-sort-icon {
   color: #FFFFFF;
