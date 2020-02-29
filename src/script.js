@@ -2,6 +2,7 @@ const sortKeyTitleAsc = "タイトル 昇順";
 const sortKeyTitleDesc = "タイトル 降順";
 const sortKeyCountAsc = "記事数 昇順";
 const sortKeyCountDesc = "記事数 降順";
+const sortKeyUserCustom = "カスタム";
 
 const liSorterTitleAsc = (a, b) => {
   if (a.title < b.title) {
@@ -47,6 +48,7 @@ const exec = () => {
   );
   const sortKeyTextElem = document.createElement("div");
   sortKeyTextElem.appendChild(document.createTextNode(sortKeyTitleAsc));
+  let sortable = null;
   keySelectorElem.addEventListener("click", e => {
     const current = sortKeyTextElem.textContent;
     if (current === sortKeyTitleAsc) {
@@ -58,7 +60,14 @@ const exec = () => {
     } else if (current === sortKeyCountAsc) {
       sort(liSorterCountDesc);
       sortKeyTextElem.textContent = sortKeyCountDesc;
+    } else if (current === sortKeyCountDesc) {
+      sortable = Sortable.create(ul, {
+        group: "esa-categories",
+        animation: 200
+      });
+      sortKeyTextElem.textContent = sortKeyUserCustom;
     } else {
+      sortable.destroy();
       sort(liSorterTitleAsc);
       sortKeyTextElem.textContent = sortKeyTitleAsc;
     }

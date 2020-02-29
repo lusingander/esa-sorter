@@ -6,7 +6,7 @@
   "content_scripts": [
     {
       "matches": ["https://*.esa.io/*"],
-      "js": ["src/script.js"],
+      "js": ["lib/Sortable.min.js", "src/script.js"],
       "css": ["css/style.css"]
     }
   ]
