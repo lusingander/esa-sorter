@@ -16,6 +16,9 @@ const liSorterTitleDesc = (a, b) => -1 * liSorterTitleAsc(a, b);
 const liSorterCountAsc = (a, b) => a.count - b.count;
 const liSorterCountDesc = (a, b) => -1 * liSorterCountAsc(a, b);
 
+const getTitleFromLi = (li) =>
+  li.querySelector("span.title > span.navbar-side__title-name").innerHTML;
+
 const exec = () => {
   const nav = document.querySelector("nav.navbar-side");
   if (nav === null) return;
@@ -28,8 +31,7 @@ const exec = () => {
       .call(lis)
       .map(li => ({
         li: li,
-        title: li.querySelector("span.title > span.navbar-side__title-name")
-          .innerHTML,
+        title: getTitleFromLi(li),
         count: Number(li.querySelector("span.count-num").innerHTML)
       }))
       .sort(sorter)
@@ -61,9 +63,31 @@ const exec = () => {
       sort(liSorterCountDesc);
       sortKeyTextElem.textContent = sortKeyCountDesc;
     } else if (current === sortKeyCountDesc) {
+      chrome.storage.local.get("custom-order", items => {
+        if ("custom-order" in items) {
+          const order = items["custom-order"];
+          sort((a, b) => {
+            const ai = order[a.title] || 99999; // FIX
+            const bi = order[b.title] || 99999;
+            if (ai < bi) return -1;
+            if (ai > bi) return 1;
+            return 0;
+          });
+        }
+      });
       sortable = Sortable.create(ul, {
         group: "esa-categories",
-        animation: 150
+        animation: 150,
+        onUpdate: (evt) => {
+          const data = [].slice
+            .call(ul.querySelectorAll("li"))
+            .map((li, i) => ({title: getTitleFromLi(li), index: i + 1})) // (0 || n) => n
+            .reduce((map, obj) => {
+              map[obj.title] = obj.index;
+              return map;
+            }, {})
+          chrome.storage.local.set({"custom-order": data});
+        }
       });
       sortKeyTextElem.textContent = sortKeyUserCustom;
     } else {

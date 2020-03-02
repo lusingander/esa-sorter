@@ -9,5 +9,6 @@
       "js": ["lib/Sortable.min.js", "src/script.js"],
       "css": ["css/style.css"]
     }
-  ]
+  ],
+  "permissions": ["storage"]
 }
