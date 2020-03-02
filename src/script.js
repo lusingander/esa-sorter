@@ -100,7 +100,7 @@ class SortUserCustomState extends SortState {
   }
 }
 
-const exec = async () => {
+(async() => {
   const nav = document.querySelector("nav.navbar-side");
   if (nav === null) return;
   const ul = nav.querySelector("ul");
@@ -146,6 +146,4 @@ const exec = async () => {
   nav.insertBefore(keySelectorElem, ul);
 
   sort(currentState.sorter());
-};
-
-exec();
+})();
