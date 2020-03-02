@@ -1,9 +1,3 @@
-const sortKeyTitleAsc = "タイトル 昇順";
-const sortKeyTitleDesc = "タイトル 降順";
-const sortKeyCountAsc = "記事数 昇順";
-const sortKeyCountDesc = "記事数 降順";
-const sortKeyUserCustom = "カスタム";
-
 const liSorterTitleAsc = (a, b) => {
   if (a.title < b.title) {
     return -1;
@@ -39,28 +33,28 @@ class SortTitleAscState extends SortState {
   constructor(ul, userData) { super(ul, userData); }
   nextState() { return super.nextState(this, new SortTitleDescState(this.ul, this.userData)); }
   sorter() { return liSorterTitleAsc; }
-  keyStr() { return sortKeyTitleAsc; }
+  keyStr() { return "タイトル 昇順"; }
 }
 
 class SortTitleDescState extends SortState {
   constructor(ul, userData) { super(ul, userData); }
   nextState() { return super.nextState(this, new SortCountAscState(this.ul, this.userData)); }
   sorter() { return liSorterTitleDesc; }
-  keyStr() { return sortKeyTitleDesc; }
+  keyStr() { return "タイトル 降順"; }
 }
 
 class SortCountAscState extends SortState {
   constructor(ul, userData) { super(ul, userData); }
   nextState() { return super.nextState(this, new SortCountDescState(this.ul, this.userData)); }
   sorter() { return liSorterCountAsc; }
-  keyStr() { return sortKeyCountAsc; }
+  keyStr() { return "記事数 昇順"; }
 }
 
 class SortCountDescState extends SortState {
   constructor(ul, userData) { super(ul, userData); }
   nextState() { return super.nextState(this, new SortUserCustomState(this.ul, this.userData)); }
   sorter() { return liSorterCountDesc; }
-  keyStr() { return sortKeyCountDesc; }
+  keyStr() { return "記事数 降順"; }
 }
 
 class SortUserCustomState extends SortState {
@@ -82,7 +76,7 @@ class SortUserCustomState extends SortState {
     }
     return (a, b) => 0;
   }
-  keyStr() { return sortKeyUserCustom; }
+  keyStr() { return "カスタム"; }
   enter() {
     this.sortable = Sortable.create(this.ul, {
       group: "esa-categories",
@@ -139,9 +133,9 @@ const exec = async () => {
     "class",
     "fa fa-sort-amount-desc search__sort-icon"
   );
-  const sortKeyTextElem = document.createElement("div");
-  sortKeyTextElem.appendChild(document.createTextNode(sortKeyTitleAsc));
   let currentState = new SortTitleAscState(ul, userData);
+  const sortKeyTextElem = document.createElement("div");
+  sortKeyTextElem.appendChild(document.createTextNode(currentState.keyStr()));
   keySelectorElem.addEventListener("click", e => {
     currentState = currentState.nextState(ul, userData);
     sort(currentState.sorter());
@@ -151,7 +145,7 @@ const exec = async () => {
   keySelectorElem.appendChild(sortKeyTextElem);
   nav.insertBefore(keySelectorElem, ul);
 
-  sort(liSorterTitleAsc);
+  sort(currentState.sorter());
 };
 
 exec();
