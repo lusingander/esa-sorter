@@ -8,3 +8,6 @@
   color: #FFFFFF;
   padding-right: 5px;
 }
+.sortable-ghost {
+  opacity: 0.3;
+}

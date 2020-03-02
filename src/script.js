@@ -63,7 +63,7 @@ const exec = () => {
     } else if (current === sortKeyCountDesc) {
       sortable = Sortable.create(ul, {
         group: "esa-categories",
-        animation: 200
+        animation: 150
       });
       sortKeyTextElem.textContent = sortKeyUserCustom;
     } else {
