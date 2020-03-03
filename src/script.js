@@ -176,12 +176,14 @@ class UserData {
     this.customOrder = data;
   }
   saveCurrentState(state) {
+    const stateName = state.constructor.name;
     chrome.storage.local.set({
       [this.domain]: {
         [storageKeyCustomOrder]: this.customOrder,
-        [storageKeyCurrentState]: state.constructor.name
+        [storageKeyCurrentState]: stateName
       }
     });
+    this.currentState = stateName;
   }
 }
 
