@@ -13,6 +13,8 @@ const liSorterCountDesc = (a, b) => -1 * liSorterCountAsc(a, b);
 const getTitleFromLi = (li) =>
   li.querySelector("span.title > span.navbar-side__title-name").innerHTML;
 
+const getClass = (name) => Function(`return (${name})`)();
+
 class SortState {
   constructor(ul, userData) {
     this.ul = ul;
@@ -108,7 +110,7 @@ class SortUserCustomState extends SortState {
   const lis = ul.querySelectorAll("li");
 
   const userData = await new Promise(resolve => {
-    chrome.storage.local.get("custom-order", items => { resolve(items) });
+    chrome.storage.local.get(["custom-order", "current-state"], items => { resolve(items) });
   });
 
   const sort = sorter => {
@@ -133,17 +135,25 @@ class SortUserCustomState extends SortState {
     "class",
     "fa fa-sort-amount-desc search__sort-icon"
   );
-  let currentState = new SortTitleAscState(ul, userData);
+  let currentState;
+  if ("current-state" in userData) {
+    const classname = getClass(userData["current-state"]);
+    currentState = new classname(ul, userData);
+  } else {
+    currentState = new SortTitleAscState(ul, userData);
+  }
   const sortKeyTextElem = document.createElement("div");
   sortKeyTextElem.appendChild(document.createTextNode(currentState.keyStr()));
   keySelectorElem.addEventListener("click", e => {
     currentState = currentState.nextState(ul, userData);
     sort(currentState.sorter());
     sortKeyTextElem.textContent = currentState.keyStr();
+    chrome.storage.local.set({"current-state": currentState.constructor.name});
   });
   keySelectorElem.appendChild(sortIconElem);
   keySelectorElem.appendChild(sortKeyTextElem);
   nav.insertBefore(keySelectorElem, ul);
 
+  currentState.enter();
   sort(currentState.sorter());
 })();
