@@ -10,10 +10,10 @@ const liSorterTitleDesc = (a, b) => -1 * liSorterTitleAsc(a, b);
 const liSorterCountAsc = (a, b) => a.count - b.count;
 const liSorterCountDesc = (a, b) => -1 * liSorterCountAsc(a, b);
 
-const getTitleFromLi = (li) =>
+const getTitleFromLi = li =>
   li.querySelector("span.title > span.navbar-side__title-name").innerHTML;
 
-const getClass = (name) => Function(`return (${name})`)();
+const getClass = name => Function(`return (${name})`)();
 
 class SortState {
   constructor(ul, userData) {
@@ -32,31 +32,72 @@ class SortState {
 }
 
 class SortTitleAscState extends SortState {
-  constructor(ul, userData) { super(ul, userData); }
-  nextState() { return super.nextState(this, new SortTitleDescState(this.ul, this.userData)); }
-  sorter() { return liSorterTitleAsc; }
-  keyStr() { return "タイトル 昇順"; }
+  constructor(ul, userData) {
+    super(ul, userData);
+  }
+  nextState() {
+    return super.nextState(
+      this,
+      new SortTitleDescState(this.ul, this.userData)
+    );
+  }
+  sorter() {
+    return liSorterTitleAsc;
+  }
+  keyStr() {
+    return "タイトル 昇順";
+  }
 }
 
 class SortTitleDescState extends SortState {
-  constructor(ul, userData) { super(ul, userData); }
-  nextState() { return super.nextState(this, new SortCountAscState(this.ul, this.userData)); }
-  sorter() { return liSorterTitleDesc; }
-  keyStr() { return "タイトル 降順"; }
+  constructor(ul, userData) {
+    super(ul, userData);
+  }
+  nextState() {
+    return super.nextState(this, new SortCountAscState(this.ul, this.userData));
+  }
+  sorter() {
+    return liSorterTitleDesc;
+  }
+  keyStr() {
+    return "タイトル 降順";
+  }
 }
 
 class SortCountAscState extends SortState {
-  constructor(ul, userData) { super(ul, userData); }
-  nextState() { return super.nextState(this, new SortCountDescState(this.ul, this.userData)); }
-  sorter() { return liSorterCountAsc; }
-  keyStr() { return "記事数 昇順"; }
+  constructor(ul, userData) {
+    super(ul, userData);
+  }
+  nextState() {
+    return super.nextState(
+      this,
+      new SortCountDescState(this.ul, this.userData)
+    );
+  }
+  sorter() {
+    return liSorterCountAsc;
+  }
+  keyStr() {
+    return "記事数 昇順";
+  }
 }
 
 class SortCountDescState extends SortState {
-  constructor(ul, userData) { super(ul, userData); }
-  nextState() { return super.nextState(this, new SortUserCustomState(this.ul, this.userData)); }
-  sorter() { return liSorterCountDesc; }
-  keyStr() { return "記事数 降順"; }
+  constructor(ul, userData) {
+    super(ul, userData);
+  }
+  nextState() {
+    return super.nextState(
+      this,
+      new SortUserCustomState(this.ul, this.userData)
+    );
+  }
+  sorter() {
+    return liSorterCountDesc;
+  }
+  keyStr() {
+    return "記事数 降順";
+  }
 }
 
 class SortUserCustomState extends SortState {
@@ -64,7 +105,9 @@ class SortUserCustomState extends SortState {
     super(ul, userData);
     this.sortable = null;
   }
-  nextState() { return super.nextState(this, new SortTitleAscState(this.ul, this.userData)); }
+  nextState() {
+    return super.nextState(this, new SortTitleAscState(this.ul, this.userData));
+  }
   sorter() {
     if ("custom-order" in this.userData) {
       const order = this.userData["custom-order"];
@@ -78,20 +121,22 @@ class SortUserCustomState extends SortState {
     }
     return (a, b) => 0;
   }
-  keyStr() { return "カスタム"; }
+  keyStr() {
+    return "カスタム";
+  }
   enter() {
     this.sortable = Sortable.create(this.ul, {
       group: "esa-categories",
       animation: 150,
-      onUpdate: (evt) => {
+      onUpdate: evt => {
         const data = [].slice
           .call(this.ul.querySelectorAll("li"))
-          .map((li, i) => ({title: getTitleFromLi(li), index: i + 1})) // (0 || n) => n
+          .map((li, i) => ({ title: getTitleFromLi(li), index: i + 1 })) // (0 || n) => n
           .reduce((map, obj) => {
             map[obj.title] = obj.index;
             return map;
-          }, {})
-        chrome.storage.local.set({"custom-order": data});
+          }, {});
+        chrome.storage.local.set({ "custom-order": data });
         this.userData["custom-order"] = data;
       }
     });
@@ -102,7 +147,7 @@ class SortUserCustomState extends SortState {
   }
 }
 
-(async() => {
+(async () => {
   const nav = document.querySelector("nav.navbar-side");
   if (nav === null) return;
   const ul = nav.querySelector("ul");
@@ -110,7 +155,9 @@ class SortUserCustomState extends SortState {
   const lis = ul.querySelectorAll("li");
 
   const userData = await new Promise(resolve => {
-    chrome.storage.local.get(["custom-order", "current-state"], items => { resolve(items) });
+    chrome.storage.local.get(["custom-order", "current-state"], items => {
+      resolve(items);
+    });
   });
 
   const sort = sorter => {
@@ -148,7 +195,9 @@ class SortUserCustomState extends SortState {
     currentState = currentState.nextState(ul, userData);
     sort(currentState.sorter());
     sortKeyTextElem.textContent = currentState.keyStr();
-    chrome.storage.local.set({"current-state": currentState.constructor.name});
+    chrome.storage.local.set({
+      "current-state": currentState.constructor.name
+    });
   });
   keySelectorElem.appendChild(sortIconElem);
   keySelectorElem.appendChild(sortKeyTextElem);
