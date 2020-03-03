@@ -15,6 +15,9 @@ const getTitleFromLi = li =>
 
 const getClass = name => Function(`return (${name})`)();
 
+const storageKeyCustomOrder = "custom-order";
+const storageKeyCurrentState = "current-state";
+
 class SortState {
   constructor(ul, userData) {
     this.ul = ul;
@@ -109,8 +112,8 @@ class SortUserCustomState extends SortState {
     return super.nextState(this, new SortTitleAscState(this.ul, this.userData));
   }
   sorter() {
-    if ("custom-order" in this.userData) {
-      const order = this.userData["custom-order"];
+    const order = this.userData.customOrder;
+    if (order) {
       return (a, b) => {
         const ai = order[a.title] || 99999; // FIX
         const bi = order[b.title] || 99999;
@@ -136,14 +139,36 @@ class SortUserCustomState extends SortState {
             map[obj.title] = obj.index;
             return map;
           }, {});
-        chrome.storage.local.set({ "custom-order": data });
-        this.userData["custom-order"] = data;
+        this.userData.saveCustomOrder(data);
       }
     });
   }
   exit() {
     this.sortable.destroy();
     this.sortable = null;
+  }
+}
+
+class UserData {
+  constructor(items) {
+    this.customOrder =
+      storageKeyCustomOrder in items ? items[storageKeyCustomOrder] : null;
+    this.currentState =
+      storageKeyCurrentState in items ? items[storageKeyCurrentState] : null;
+  }
+  getCurrentState(ul) {
+    return this.currentState
+      ? new (getClass(this.currentState))(ul, this)
+      : new SortCountAscState(ul, this);
+  }
+  saveCustomOrder(data) {
+    chrome.storage.local.set({ [storageKeyCustomOrder]: data });
+    this.customOrder = data;
+  }
+  saveCurrentState(state) {
+    chrome.storage.local.set({
+      [storageKeyCurrentState]: state.constructor.name
+    });
   }
 }
 
@@ -155,9 +180,12 @@ class SortUserCustomState extends SortState {
   const lis = ul.querySelectorAll("li");
 
   const userData = await new Promise(resolve => {
-    chrome.storage.local.get(["custom-order", "current-state"], items => {
-      resolve(items);
-    });
+    chrome.storage.local.get(
+      [storageKeyCustomOrder, storageKeyCurrentState],
+      items => {
+        resolve(new UserData(items));
+      }
+    );
   });
 
   const sort = sorter => {
@@ -182,22 +210,14 @@ class SortUserCustomState extends SortState {
     "class",
     "fa fa-sort-amount-desc search__sort-icon"
   );
-  let currentState;
-  if ("current-state" in userData) {
-    const classname = getClass(userData["current-state"]);
-    currentState = new classname(ul, userData);
-  } else {
-    currentState = new SortTitleAscState(ul, userData);
-  }
+  let currentState = userData.getCurrentState(ul);
   const sortKeyTextElem = document.createElement("div");
   sortKeyTextElem.appendChild(document.createTextNode(currentState.keyStr()));
   keySelectorElem.addEventListener("click", e => {
     currentState = currentState.nextState(ul, userData);
     sort(currentState.sorter());
     sortKeyTextElem.textContent = currentState.keyStr();
-    chrome.storage.local.set({
-      "current-state": currentState.constructor.name
-    });
+    userData.saveCurrentState(currentState);
   });
   keySelectorElem.appendChild(sortIconElem);
   keySelectorElem.appendChild(sortKeyTextElem);
