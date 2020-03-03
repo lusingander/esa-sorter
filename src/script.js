@@ -150,11 +150,16 @@ class SortUserCustomState extends SortState {
 }
 
 class UserData {
-  constructor(items) {
+  constructor(items, domain) {
+    this.domain = domain;
     this.customOrder =
-      storageKeyCustomOrder in items ? items[storageKeyCustomOrder] : null;
+      domain in items && storageKeyCustomOrder in items[domain]
+        ? items[domain][storageKeyCustomOrder]
+        : null;
     this.currentState =
-      storageKeyCurrentState in items ? items[storageKeyCurrentState] : null;
+      domain in items && storageKeyCurrentState in items[domain]
+        ? items[domain][storageKeyCurrentState]
+        : null;
   }
   getCurrentState(ul) {
     return this.currentState
@@ -162,12 +167,20 @@ class UserData {
       : new SortCountAscState(ul, this);
   }
   saveCustomOrder(data) {
-    chrome.storage.local.set({ [storageKeyCustomOrder]: data });
+    chrome.storage.local.set({
+      [this.domain]: {
+        [storageKeyCustomOrder]: data,
+        [storageKeyCurrentState]: this.currentState
+      }
+    });
     this.customOrder = data;
   }
   saveCurrentState(state) {
     chrome.storage.local.set({
-      [storageKeyCurrentState]: state.constructor.name
+      [this.domain]: {
+        [storageKeyCustomOrder]: this.customOrder,
+        [storageKeyCurrentState]: state.constructor.name
+      }
     });
   }
 }
@@ -179,13 +192,12 @@ class UserData {
   if (ul === null) return;
   const lis = ul.querySelectorAll("li");
 
+  const currentDomain = document.domain;
+
   const userData = await new Promise(resolve => {
-    chrome.storage.local.get(
-      [storageKeyCustomOrder, storageKeyCurrentState],
-      items => {
-        resolve(new UserData(items));
-      }
-    );
+    chrome.storage.local.get([currentDomain], items => {
+      resolve(new UserData(items, currentDomain));
+    });
   });
 
   const sort = sorter => {
