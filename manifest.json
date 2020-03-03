@@ -2,7 +2,7 @@
   "name": "esa sorter",
   "version": "0.0.1",
   "manifest_version": 2,
-  "description": "make esa.io categories sortable.",
+  "description": "Sort categories in esa.io",
   "content_scripts": [
     {
       "matches": ["https://*.esa.io/*"],
